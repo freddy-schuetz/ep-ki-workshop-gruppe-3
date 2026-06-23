@@ -1,9 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { kiBild } from "@/lib/kreativ";
+
+const BILD_PROMPT =
+  "Lionel Messi in Argentina football jersey and a man named Niklas standing together on the Rothorn mountain summit above Lenzerheide Switzerland in summer, green alpine meadow, cows grazing nearby, panoramic view looking down towards Lenzerheide valley and lake, bright blue sky, realistic photo style";
 
 export default function Home() {
-  const [gruss, setGruss] = useState("Viel Schnee & gute Schwünge aus der Lenzerheide! ⛷️");
+  const [gruss, setGruss] = useState("Grüsse aus der Lenzerheide! ⛷️🐄");
+  const [bildUrl, setBildUrl] = useState<string | null>(null);
+  const [laedt, setLaedt] = useState(true);
+
+  useEffect(() => {
+    kiBild(BILD_PROMPT)
+      .then((url) => { setBildUrl(url); setLaedt(false); })
+      .catch(() => setLaedt(false));
+  }, []);
 
   return (
     <main className="min-h-screen bg-blue-950 flex flex-col items-center justify-center p-6">
@@ -14,12 +26,26 @@ export default function Home() {
       {/* Die Postkarte */}
       <div className="relative w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl">
         {/* Hintergrundbild */}
-        <img
-          src="https://images.unsplash.com/photo-1551524164-687a55dd1126?w=900&q=80"
-          alt="Lenzerheide Winter"
-          className="w-full object-cover"
-          style={{ height: "420px" }}
-        />
+        {laedt ? (
+          <div className="w-full flex items-center justify-center bg-white/10 text-white/60 text-xl"
+            style={{ height: "420px" }}>
+            ✨ KI malt euer Bild … einen Moment …
+          </div>
+        ) : bildUrl ? (
+          <img
+            src={bildUrl}
+            alt="Messi und Niklas auf dem Rothorn"
+            className="w-full object-cover"
+            style={{ height: "420px" }}
+          />
+        ) : (
+          <img
+            src="https://images.unsplash.com/photo-1551524164-687a55dd1126?w=900&q=80"
+            alt="Lenzerheide"
+            className="w-full object-cover"
+            style={{ height: "420px" }}
+          />
+        )}
 
         {/* Gruß-Text auf dem Bild */}
         <div
