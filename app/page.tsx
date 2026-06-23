@@ -1,98 +1,48 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { kiBild } from "@/lib/kreativ";
-
-const STATIONEN = [
-  {
-    nr: 1,
-    emoji: "🌍",
-    titel: "Die Welt",
-    text: "Irgendwo da draußen wartet das perfekte Ski-Abenteuer. Die Reise beginnt.",
-    bg: "bg-blue-950",
-    bildPrompt: null,
-  },
-  {
-    nr: 2,
-    emoji: "🚌",
-    titel: "Die Alpen rufen",
-    text: "Südtirol, Italien. Im komfortablen E&P-Reisebus geht es durch die verschneiten Alpen ins Ahrntal.",
-    bg: "bg-slate-700",
-    bildPrompt: "Ein moderner Reisebus fährt auf einer Alpenstraße durch verschneite Berglandschaft Richtung Südtirol, stimmungsvolles Winterlicht, Fotografie",
-  },
-  {
-    nr: 3,
-    emoji: "⛷️",
-    titel: "Klausberg & Speikboden",
-    text: "50 km Pisten, 2.510 m Höhe, Sonne pur. Willkommen im Ahrntal!",
-    bg: "bg-sky-800",
-    bildPrompt: null,
-  },
-  {
-    nr: 4,
-    emoji: "🏠",
-    titel: "Ankommen & Genießen",
-    text: "Après-Ski, warme Stube, Südtiroler Küche. Der perfekte Abschluss eines perfekten Tags.",
-    bg: "bg-amber-900",
-    bildPrompt: null,
-  },
-];
-
-function Station({ s }: { s: (typeof STATIONEN)[0] }) {
-  const ref = useRef<HTMLElement>(null);
-  const [sichtbar, setSichtbar] = useState(false);
-  const [bildUrl, setBildUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const beobachter = new IntersectionObserver(
-      ([eintrag]) => {
-        if (eintrag.isIntersecting) {
-          setSichtbar(true);
-          if (s.bildPrompt && !bildUrl) {
-            kiBild(s.bildPrompt).then(setBildUrl).catch(() => null);
-          }
-        }
-      },
-      { threshold: 0.3 }
-    );
-    if (ref.current) beobachter.observe(ref.current);
-    return () => beobachter.disconnect();
-  }, []);
-
-  return (
-    <section
-      ref={ref}
-      className={`${s.bg} flex min-h-screen flex-col items-center justify-center p-8 text-white`}
-    >
-      <div
-        className="max-w-2xl text-center transition-all duration-1000"
-        style={{ opacity: sichtbar ? 1 : 0, transform: sichtbar ? "translateY(0)" : "translateY(40px)" }}
-      >
-        <div className="text-6xl">{s.emoji}</div>
-        <h2 className="mt-6 text-5xl font-black">{s.titel}</h2>
-        <p className="mt-4 text-xl opacity-80">{s.text}</p>
-        {s.bildPrompt && (
-          <div className="mt-8 overflow-hidden rounded-2xl shadow-2xl">
-            {bildUrl ? (
-              <img src={bildUrl} alt={s.titel} className="w-full object-cover" />
-            ) : (
-              <div className="flex h-48 items-center justify-center bg-white/10 text-white/50">
-                Bild wird gemalt … ✨
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
+import { useState } from "react";
 
 export default function Home() {
+  const [gruss, setGruss] = useState("Viel Schnee & gute Schwünge aus der Lenzerheide! ⛷️");
+
   return (
-    <main>
-      {STATIONEN.map((s) => (
-        <Station key={s.nr} s={s} />
-      ))}
+    <main className="min-h-screen bg-blue-950 flex flex-col items-center justify-center p-6">
+      <h1 className="text-white text-4xl font-black mb-8 tracking-wide">
+        ✉️ Postkarte aus der Lenzerheide
+      </h1>
+
+      {/* Die Postkarte */}
+      <div className="relative w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl">
+        {/* Hintergrundbild */}
+        <img
+          src="https://images.unsplash.com/photo-1551524164-687a55dd1126?w=900&q=80"
+          alt="Lenzerheide Winter"
+          className="w-full object-cover"
+          style={{ height: "420px" }}
+        />
+
+        {/* Gruß-Text auf dem Bild */}
+        <div
+          className="absolute bottom-0 left-0 right-0 p-6"
+          style={{ background: "linear-gradient(transparent, rgba(0,0,0,0.7))" }}
+        >
+          <p className="text-white text-2xl font-bold text-center"
+            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
+            {gruss}
+          </p>
+        </div>
+      </div>
+
+      {/* Eingabefeld */}
+      <div className="mt-8 w-full max-w-2xl">
+        <label className="text-white/80 text-sm mb-2 block">Euer Gruß auf der Postkarte:</label>
+        <textarea
+          className="w-full rounded-xl p-4 text-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/60 resize-none"
+          rows={3}
+          value={gruss}
+          onChange={(e) => setGruss(e.target.value)}
+        />
+      </div>
     </main>
   );
 }
